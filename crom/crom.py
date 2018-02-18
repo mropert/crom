@@ -7,21 +7,36 @@ import cmake
 import cpp
 
 
+def generate_exe(name):
+    sources = cpp.generate_exe(name)
+    cmakefiles = cmake.generate_exe(name, sources.keys())
+
+    files = sources
+    files.update(cmakefiles)
+    return files
+
+
+def generate_lib(name, src_dir, include_dir):
+    sources = cpp.generate_lib(name, src_dir, include_dir)
+    cmakefiles = cmake.generate_lib(name, sources.keys(), src_dir, include_dir)
+
+    files = sources
+    files.update(cmakefiles)
+    return files
+
+
 def run():
     parser = argparse.ArgumentParser()
+    parser.add_argument("kind", help="the kind of project (lib or exe)", choices=['lib', 'exe'])
     parser.add_argument("name", help="the name of the project")
     args = parser.parse_args()
     name = args.name
 
-    # Generate C++ sources
-    sources = cpp.generate_exe(name)
-
-    # Generate build files
-    cmakefiles = cmake.generate(name, sources.keys())
-
-    # Bundle all files to generate
-    files = sources
-    files.update(cmakefiles)
+    # Generate files
+    if args.kind == 'lib':
+        files = generate_lib(name, 'src', 'include')
+    else:
+        files = generate_exe(name)
 
     # Write files to disk
     for file, content in files.items():
