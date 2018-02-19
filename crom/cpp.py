@@ -1,6 +1,6 @@
 def generate_lib(name, src_dir, include_dir):
     sources = {}
-    
+
     # Header file
     header_path = '%s/%s.hpp' % (name, name)
     file = '%s/%s' % (include_dir, header_path)
