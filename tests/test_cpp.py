@@ -2,12 +2,17 @@ from crom import cpp
 
 
 def test_generate_lib():
-    sources = cpp.generate_lib('hello', 'src', 'include')
-    assert len(sources) == 2
-    assert 'include/hello/hello.hpp' in sources
-    assert 'src/hello.cpp' in sources
+    project = cpp.generate_lib('hello')
 
-    assert sources['include/hello/hello.hpp'] == ('#ifndef HELLO_HELLO_HPP\n'
+    assert len(project.headers) == 1
+    assert len(project.sources) == 1
+    assert len(project.tests) == 1
+
+    assert 'hello/hello.hpp' in project.headers
+    assert 'hello.cpp' in project.sources
+    assert 'hello_test.cpp' in project.tests
+
+    assert project.headers['hello/hello.hpp'] == ('#ifndef HELLO_HELLO_HPP\n'
                                                   '#define HELLO_HELLO_HPP\n'
                                                   '\n'
                                                   '#include <string>\n'
@@ -18,26 +23,50 @@ def test_generate_lib():
                                                   '}\n'
                                                   '#endif\n')
 
-    assert sources['src/hello.cpp'] == ('#include <hello/hello.hpp>\n'
-                                        '\n'
-                                        'namespace hello {\n'
-                                        'std::string foo() {\n'
-                                        '   return "Hello world!";\n'
-                                        '}\n'
-                                        '\n'
-                                        'int bar(int a, int b) {\n'
-                                        '   return a + b;\n'
-                                        '}\n'
-                                        '}\n')
+    assert project.sources['hello.cpp'] == ('#include <hello/hello.hpp>\n'
+                                            '\n'
+                                            'namespace hello {\n'
+                                            'std::string foo() {\n'
+                                            '   return "Hello world!";\n'
+                                            '}\n'
+                                            '\n'
+                                            'int bar(int a, int b) {\n'
+                                            '   return a + b;\n'
+                                            '}\n'
+                                            '}\n')
+
+    assert project.tests['hello_test.cpp'] == (
+        '// FIXME: You definitely want to include a test framework here\n'
+        '#include <iostream>\n'
+        '#define ASSERT(cond) \\\n'
+        '   if (!(cond)) {\\\n'
+        '       std::cerr << "Assertion failed: " << #cond << std::endl;\\\n'
+        '       return 1;\\\n'
+        '   }\n'
+        '\n'
+        '#include <hello/hello.hpp>\n'
+        'using namespace hello;\n'
+        '\n'
+        'int main() {\n'
+        '   ASSERT(foo() == "Hello world!");\n'
+        '   ASSERT(bar(1, 1) == 2);\n'
+        '   ASSERT(bar(1, 2) == 3);\n'
+        '   ASSERT(bar(0, 42) == 42);\n'
+        '\n'
+        '   std::cout << "All tests passed!" << std::endl;\n'
+        '   return 0;\n'
+        '}\n')
 
 
 def test_generate_exe():
-    sources = cpp.generate_exe('hello')
-    assert len(sources) == 1
-    assert 'src/hello.cpp' in sources
-    assert sources['src/hello.cpp'] == ('#include <iostream>\n'
-                                        '\n'
-                                        'int main() {\n'
-                                        '   std::cout << "Hello world!" << std::endl;\n'
-                                        '   return 0;\n'
-                                        '}\n')
+    project = cpp.generate_exe('hello')
+    assert len(project.headers) == 0
+    assert len(project.sources) == 1
+    assert len(project.tests) == 0
+    assert 'hello.cpp' in project.sources
+    assert project.sources['hello.cpp'] == ('#include <iostream>\n'
+                                            '\n'
+                                            'int main() {\n'
+                                            '   std::cout << "Hello world!" << std::endl;\n'
+                                            '   return 0;\n'
+                                            '}\n')

@@ -7,20 +7,20 @@ import cmake
 import cpp
 
 
-def generate_exe(name):
-    sources = cpp.generate_exe(name)
-    cmakefiles = cmake.generate_exe(name, sources.keys())
+def generate_exe(name, src_dir):
+    project = cpp.generate_exe(name)
+    cmakefiles = cmake.generate_exe(project, src_dir)
 
-    files = sources
+    files = project.get_all_files(src_dir=src_dir)
     files.update(cmakefiles)
     return files
 
 
-def generate_lib(name, src_dir, include_dir):
-    sources = cpp.generate_lib(name, src_dir, include_dir)
-    cmakefiles = cmake.generate_lib(name, sources.keys(), src_dir, include_dir)
+def generate_lib(name, src_dir, include_dir, test_dir):
+    project = cpp.generate_lib(name)
+    cmakefiles = cmake.generate_lib(project, src_dir, include_dir, test_dir)
 
-    files = sources
+    files = project.get_all_files(src_dir, include_dir, test_dir)
     files.update(cmakefiles)
     return files
 
@@ -34,9 +34,9 @@ def run():
 
     # Generate files
     if args.kind == 'lib':
-        files = generate_lib(name, 'src', 'include')
+        files = generate_lib(name, 'src', 'include', 'test')
     else:
-        files = generate_exe(name)
+        files = generate_exe(name, 'src')
 
     # Write files to disk
     for file, content in files.items():
@@ -48,7 +48,7 @@ def run():
 
     # Output summary
     print("The following files have been generated:")
-    for file in files.keys():
+    for file in sorted(files.keys()):
         print("- " + file)
 
 
