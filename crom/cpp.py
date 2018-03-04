@@ -1,4 +1,4 @@
-from project import Project
+from .project import Project
 
 
 def generate_lib(name):
