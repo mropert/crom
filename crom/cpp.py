@@ -1,9 +1,10 @@
-def generate_lib(name, src_dir, include_dir):
-    sources = {}
+from .project import Project
 
-    # Header file
+
+def generate_lib(name):
+    # Headers
     header_path = '%s/%s.hpp' % (name, name)
-    file = '%s/%s' % (include_dir, header_path)
+    file = header_path
     template = ('#ifndef {header_guard_define}\n'
                 '#define {header_guard_define}\n'
                 '\n'
@@ -14,11 +15,11 @@ def generate_lib(name, src_dir, include_dir):
                 'int bar(int a, int b);\n'
                 '}}\n'
                 '#endif\n')
-    sources[file] = template.format(header_guard_define='%s_%s_HPP' % (name.upper(), name.upper()),
-                                    namespace=name)
+    headers = {file: template.format(header_guard_define='%s_%s_HPP' % (name.upper(), name.upper()),
+                                     namespace=name)}
 
-    # Source file
-    file = '%s/%s.cpp' % (src_dir, name)
+    # Sources
+    file = '%s.cpp' % name
     template = ('#include <{header_path}>\n'
                 '\n'
                 'namespace {namespace} {{\n'
@@ -30,17 +31,42 @@ def generate_lib(name, src_dir, include_dir):
                 '   return a + b;\n'
                 '}}\n'
                 '}}\n')
-    sources[file] = template.format(header_path=header_path, namespace=name)
+    sources = {file: template.format(header_path=header_path, namespace=name)}
 
-    return sources
+    # Tests
+    file = '%s_test.cpp' % name
+    template = (
+        '// FIXME: You definitely want to include a test framework here\n'
+        '#include <iostream>\n'
+        '#define ASSERT(cond) \\\n'
+        '   if (!(cond)) {{\\\n'
+        '       std::cerr << "Assertion failed: " << #cond << std::endl;\\\n'
+        '       return 1;\\\n'
+        '   }}\n'
+        '\n'
+        '#include <{header_path}>\n'
+        'using namespace {namespace};\n'
+        '\n'
+        'int main() {{\n'
+        '   ASSERT(foo() == "Hello world!");\n'
+        '   ASSERT(bar(1, 1) == 2);\n'
+        '   ASSERT(bar(1, 2) == 3);\n'
+        '   ASSERT(bar(0, 42) == 42);\n'
+        '\n'
+        '   std::cout << "All tests passed!" << std::endl;\n'
+        '   return 0;\n'
+        '}}\n')
+    tests = {file: template.format(header_path=header_path, namespace=name)}
+
+    return Project(name, sources, headers, tests)
 
 
 def generate_exe(name):
-    file = 'src/%s.cpp' % name
+    file = '%s.cpp' % name
     template = ('#include <iostream>\n'
                 '\n'
                 'int main() {\n'
                 '   std::cout << "Hello world!" << std::endl;\n'
                 '   return 0;\n'
                 '}\n')
-    return {file: template}
+    return Project(name, sources={file: template})
