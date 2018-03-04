@@ -3,7 +3,8 @@ from .project import Project
 
 def generate_lib(name):
     # Headers
-    file = '%s/%s.hpp' % (name, name)
+    header_path = '%s/%s.hpp' % (name, name)
+    file = header_path
     template = ('#ifndef {header_guard_define}\n'
                 '#define {header_guard_define}\n'
                 '\n'
@@ -30,7 +31,7 @@ def generate_lib(name):
                 '   return a + b;\n'
                 '}}\n'
                 '}}\n')
-    sources = {file: template.format(header_path=headers.keys()[0], namespace=name)}
+    sources = {file: template.format(header_path=header_path, namespace=name)}
 
     # Tests
     file = '%s_test.cpp' % name
@@ -55,7 +56,7 @@ def generate_lib(name):
         '   std::cout << "All tests passed!" << std::endl;\n'
         '   return 0;\n'
         '}}\n')
-    tests = {file: template.format(header_path=headers.keys()[0], namespace=name)}
+    tests = {file: template.format(header_path=header_path, namespace=name)}
 
     return Project(name, sources, headers, tests)
 
