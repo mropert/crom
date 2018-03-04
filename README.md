@@ -2,6 +2,8 @@
 
 A C/C++ project bootstrapper.
 
+[![Build Status](https://travis-ci.org/mropert/crom.svg?branch=master)](https://travis-ci.org/mropert/crom)
+
 ## Setup
 
 Install through `pip` (once uploaded...):
