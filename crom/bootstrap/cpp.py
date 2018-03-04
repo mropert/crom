@@ -1,4 +1,4 @@
-from .project import Project
+from crom.bootstrap.bootstrap import Bootstrap
 
 
 def generate_lib(name):
@@ -58,7 +58,7 @@ def generate_lib(name):
         '}}\n')
     tests = {file: template.format(header_path=header_path, namespace=name)}
 
-    return Project(name, sources, headers, tests)
+    return Bootstrap(name, sources, headers, tests)
 
 
 def generate_exe(name):
@@ -69,4 +69,4 @@ def generate_exe(name):
                 '   std::cout << "Hello world!" << std::endl;\n'
                 '   return 0;\n'
                 '}\n')
-    return Project(name, sources={file: template})
+    return Bootstrap(name, sources={file: template})

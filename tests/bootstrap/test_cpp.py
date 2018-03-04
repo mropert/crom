@@ -1,4 +1,4 @@
-from crom import cpp
+from crom.bootstrap import cpp
 
 
 def test_generate_lib():

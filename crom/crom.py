@@ -3,25 +3,30 @@ from __future__ import print_function
 import argparse
 import os
 
-import cmake
-import cpp
+import build
+from bootstrap import cmake
+from bootstrap import cpp
 
 
 def generate_exe(name, src_dir):
-    project = cpp.generate_exe(name)
+    bootstrap = cpp.generate_exe(name)
+    project = bootstrap.to_project(src_dir)
     cmakefiles = cmake.generate_exe(project, src_dir)
 
-    files = project.get_all_files(src_dir=src_dir)
+    files = bootstrap.get_all_files(src_dir=src_dir)
     files.update(cmakefiles)
+    files['build.yml'] = build.to_yaml(project)
     return files
 
 
 def generate_lib(name, src_dir, include_dir, test_dir):
-    project = cpp.generate_lib(name)
-    cmakefiles = cmake.generate_lib(project, src_dir, include_dir, test_dir)
+    bootstrap = cpp.generate_lib(name)
+    project = bootstrap.to_project(src_dir, include_dir, test_dir)
+    cmakefiles = cmake.generate_lib(project, src_dir, include_dir)
 
-    files = project.get_all_files(src_dir, include_dir, test_dir)
+    files = bootstrap.get_all_files(src_dir, include_dir, test_dir)
     files.update(cmakefiles)
+    files['build.yml'] = build.to_yaml(project)
     return files
 
 

@@ -25,31 +25,30 @@ def exe_decl(name, sources, deps=[]):
                         deps_decl(name, deps))
 
 
-def tests_decl(project, test_dir):
+def tests_decl(project):
     if len(project.tests) == 0:
         return None
 
     test_name = "%s_test" % project.name
     template = "add_test(NAME {test_name} COMMAND {test_name})"
     return concat_lines('enable_testing()',
-                        exe_decl(test_name, project.list_tests(test_dir),
-                                 [(project.name, 'PRIVATE')]),
+                        exe_decl(test_name, project.tests, [(project.name, 'PRIVATE')]),
                         template.format(test_name=test_name))
 
 
-def generate_lib(project, src_dir, include_dir, test_dir):
+def generate_lib(project, src_dir, include_dir):
     template = ("add_library({name} {files})\n"
                 "target_include_directories({name} PUBLIC {include_dir})\n"
                 "target_include_directories({name} PRIVATE {src_dir})")
-    files = ' '.join(project.list_sources_and_headers(src_dir, include_dir))
+    files = ' '.join(project.sources + project.headers)
     content = concat_sections(header_decl(project.name),
                               template.format(name=project.name, files=files, src_dir=src_dir,
                                               include_dir=include_dir),
-                              tests_decl(project, test_dir))
+                              tests_decl(project))
     return {'CMakeLists.txt': content + '\n'}
 
 
 def generate_exe(project, src_dir):
     content = concat_sections(header_decl(project.name),
-                              exe_decl(project.name, project.list_sources(src_dir)))
+                              exe_decl(project.name, project.sources))
     return {'CMakeLists.txt': content + '\n'}
