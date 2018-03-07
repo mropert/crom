@@ -1,33 +1,28 @@
 from __future__ import print_function
 
 import argparse
-import os
 import sys
 
-import build
-from bootstrap import cmake
+import configure
+import tools
 from bootstrap import cpp
 
 
 def generate_exe(name, src_dir):
     bootstrap = cpp.generate_exe(name)
     project = bootstrap.to_project(src_dir)
-    cmakefiles = cmake.generate_exe(project, src_dir)
 
     files = bootstrap.get_all_files(src_dir=src_dir)
-    files.update(cmakefiles)
-    files['build.yml'] = build.to_yaml(project)
+    files['build.yml'] = project.to_yaml()
     return files
 
 
 def generate_lib(name, src_dir, include_dir, test_dir):
     bootstrap = cpp.generate_lib(name)
     project = bootstrap.to_project(src_dir, include_dir, test_dir)
-    cmakefiles = cmake.generate_lib(project, src_dir, include_dir)
 
     files = bootstrap.get_all_files(src_dir, include_dir, test_dir)
-    files.update(cmakefiles)
-    files['build.yml'] = build.to_yaml(project)
+    files['build.yml'] = project.to_yaml()
     return files
 
 
@@ -45,12 +40,7 @@ def cmd_bootstrap(*argv):
         files = generate_exe(name, 'src')
 
     # Write files to disk
-    for file, content in files.items():
-        dir = os.path.dirname(file)
-        if len(dir) > 0 and not os.path.exists(dir):
-            os.makedirs(dir, mode=0O755)
-        with open(file, 'w') as f:
-            f.write(content)
+    tools.write_files(files)
 
     # Output summary
     print("The following files have been generated:")
@@ -58,15 +48,25 @@ def cmd_bootstrap(*argv):
         print("- " + file)
 
 
+def cmd_configure(*argv):
+    parser = argparse.ArgumentParser(prog="crom bootstrap")
+    parser.add_argument("path", help="path to the project sources")
+    parser.add_argument("-f", "--force", help="force re-configuration regardless of timestamps",
+                        default=False, action='store_true')
+    args = parser.parse_args(*argv)
+    return configure.configure(args.path, args.force)
+
+
 def usage():
     print("usage: crom <command>")
     print("  bootstrap      start a new project")
+    print("  configure      configure a project for build")
     print('Try "crom <command> -h" to get help on a given command')
 
 
 def run():
     argv = sys.argv[1:]
-    commands = {'bootstrap': cmd_bootstrap}
+    commands = {'bootstrap': cmd_bootstrap, 'configure': cmd_configure}
     if len(argv) == 0 or argv[0] not in commands.keys():
         usage()
         return 1
