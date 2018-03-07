@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import argparse
 import os
+import sys
 
 import build
 from bootstrap import cmake
@@ -30,11 +31,11 @@ def generate_lib(name, src_dir, include_dir, test_dir):
     return files
 
 
-def run():
-    parser = argparse.ArgumentParser()
+def cmd_bootstrap(*argv):
+    parser = argparse.ArgumentParser(prog="crom bootstrap")
     parser.add_argument("kind", help="the kind of project (lib or exe)", choices=['lib', 'exe'])
     parser.add_argument("name", help="the name of the project")
-    args = parser.parse_args()
+    args = parser.parse_args(*argv)
     name = args.name
 
     # Generate files
@@ -55,6 +56,21 @@ def run():
     print("The following files have been generated:")
     for file in sorted(files.keys()):
         print("- " + file)
+
+
+def usage():
+    print("usage: crom <command>")
+    print("  bootstrap      start a new project")
+    print('Try "crom <command> -h" to get help on a given command')
+
+
+def run():
+    argv = sys.argv[1:]
+    commands = {'bootstrap': cmd_bootstrap}
+    if len(argv) == 0 or argv[0] not in commands.keys():
+        usage()
+        return 1
+    return commands[argv[0]](argv[1:])
 
 
 if __name__ == "__main__":
