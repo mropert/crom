@@ -2,7 +2,7 @@ from crom.bootstrap.bootstrap import Bootstrap
 
 
 def test_bootstrap():
-    bootstrap = Bootstrap('hello', {'hello.cpp': None}, {'hello/hello.hpp': None},
+    bootstrap = Bootstrap('hello', 'lib', {'hello.cpp': None}, {'hello/hello.hpp': None},
                                    {'hello_test.cpp': None})
     project = bootstrap.to_project()
     assert project.name == 'hello'
@@ -19,7 +19,7 @@ def test_get_files():
     sources = {'bar.cpp': 'x', 'foo.cpp': 'y'}
     headers = {'hello/bar.hpp': 'z', 'hello/foo.hpp': 'w'}
     tests = {'test.cpp': 't'}
-    bootstrap = Bootstrap('hello', sources=sources, headers=headers, tests=tests)
+    bootstrap = Bootstrap('hello', 'lib', sources=sources, headers=headers, tests=tests)
     assert bootstrap.get_all_files() == {
         'bar.cpp': 'x', 'foo.cpp': 'y',
         'hello/bar.hpp': 'z', 'hello/foo.hpp': 'w',

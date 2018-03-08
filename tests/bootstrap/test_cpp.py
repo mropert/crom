@@ -4,6 +4,9 @@ from crom.bootstrap import cpp
 def test_generate_lib():
     project = cpp.generate_lib('hello')
 
+    assert project.name == 'hello'
+    assert project.type == 'lib'
+
     assert len(project.headers) == 1
     assert len(project.sources) == 1
     assert len(project.tests) == 1
@@ -60,10 +63,16 @@ def test_generate_lib():
 
 def test_generate_exe():
     project = cpp.generate_exe('hello')
+
+    assert project.name == 'hello'
+    assert project.type == 'exe'
+
     assert len(project.headers) == 0
     assert len(project.sources) == 1
     assert len(project.tests) == 0
+
     assert 'hello.cpp' in project.sources
+
     assert project.sources['hello.cpp'] == ('#include <iostream>\n'
                                             '\n'
                                             'int main() {\n'

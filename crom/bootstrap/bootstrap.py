@@ -17,14 +17,15 @@ def get_files(files, dir):
 
 
 class Bootstrap:
-    def __init__(self, name, sources={}, headers={}, tests={}):
+    def __init__(self, name, type, sources={}, headers={}, tests={}):
         self.name = name
+        self.type = type
         self.sources = sources
         self.headers = headers
         self.tests = tests
 
     def to_project(self, src_dir=None, include_dir=None, test_dir=None):
-        return Project(self.name, list_files(self.sources.keys(), src_dir),
+        return Project(self.name, self.type, list_files(self.sources.keys(), src_dir),
                        list_files(self.headers.keys(), include_dir),
                        list_files(self.tests.keys(), test_dir))
 
