@@ -26,7 +26,7 @@ setup(
     # Versions should comply with PEP 440:
     # https://www.python.org/dev/peps/pep-0440/
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.2.0',  # Required
+    version='0.0.1',  # Required
 
     # https://packaging.python.org/specifications/core-metadata/#summary
     description='A C/C++ project boostrapper',  # Required
