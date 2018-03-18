@@ -1,4 +1,4 @@
-from crom.bootstrap import cmake
+from crom.generators import cmake
 from crom.project import Project
 
 

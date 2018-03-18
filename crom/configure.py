@@ -1,9 +1,9 @@
 from __future__ import print_function
 import os
 
+from generators import cmake
 from project import Project
 import tools
-from bootstrap import cmake
 
 
 def is_up_to_date(project_file):
