@@ -29,7 +29,7 @@ setup(
     version='0.0.1',  # Required
 
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description='A C/C++ project boostrapper',  # Required
+    description='A C/C++ project builder with simple declarative syntax',  # Required
 
     # https://packaging.python.org/specifications/core-metadata/#description-optional
     # long_description=long_description,  # Optional
