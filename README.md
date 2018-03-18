@@ -4,6 +4,9 @@ A C/C++ project builder with simple declarative syntax.
 
 [![Build Status](https://travis-ci.org/mropert/crom.svg?branch=master)](https://travis-ci.org/mropert/crom)
 
+**This project is still in early development stage and more of a proof of concept than a real solution.**
+**Should you be interested in using it, please contact me first.**
+
 ## Setup
 
 Install through `pip` (once uploaded...):
