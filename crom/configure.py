@@ -1,5 +1,7 @@
 from __future__ import print_function
 import os
+from subprocess import call
+
 
 from generators import cmake, conan
 from project import Project
@@ -22,6 +24,33 @@ def generate(project, src_dir):
     return config.keys()
 
 
+def install_dependencies(profile=None):
+    args = [] if profile is None else ['-pr', profile]
+    return call(['conan', 'install', '.', '--build=outdated'] + args)
+
+
+def do_configure(project_cfg_path):
+    # Load project file
+    try:
+        with open(project_cfg_path, 'r') as f:
+            project = Project.from_yaml(f)
+    except Exception as e:
+        print("could not load project configuration: " + str(e))
+        return 1
+
+    # Write configuration
+    files = generate(project, os.path.dirname(project_cfg_path))
+    print("Configuration files generated: " + ', '.join(files))
+
+    # Install deps
+    ret = install_dependencies()
+    if ret:
+        print("configuration failed: could not install dependencies")
+        return 1
+
+    return 0
+
+
 def configure(src_dir, force=False):
     try:
         project_cfg_path = tools.get_build_file(src_dir)
@@ -34,14 +63,4 @@ def configure(src_dir, force=False):
         print("configuration is up-to-date, nothing to do (re-run with --force to generate anyway)")
         return 0
 
-    # Load project file
-    try:
-        with open(project_cfg_path, 'r') as f:
-            project = Project.from_yaml(f)
-    except Exception as e:
-        print("could not load project configuration: " + str(e))
-        return 1
-
-    # Write configuration
-    files = generate(project, src_dir)
-    print("Configuration files generated: " + ', '.join(files))
+    return do_configure(project_cfg_path)

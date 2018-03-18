@@ -60,8 +60,9 @@ def cmd_configure(*argv):
 
 def cmd_build(*argv):
     parser = argparse.ArgumentParser(prog="crom build")
-    parser.parse_args(*argv)
-    return build.build()
+    parser.add_argument("path", help="path to the project sources")
+    args = parser.parse_args(*argv)
+    return build.build(args.path)
 
 
 def usage():
