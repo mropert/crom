@@ -1,4 +1,4 @@
-from crom.bootstrap import cmake
+from crom.generators import cmake
 from crom.project import Project
 
 
@@ -10,6 +10,9 @@ def test_generate_lib():
     assert 'CMakeLists.txt' in files
     assert files['CMakeLists.txt'] == ('cmake_minimum_required(VERSION 3.2)\n'
                                        'project(hello)\n'
+                                       '\n'
+                                       'include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)\n'
+                                       'conan_basic_setup()\n'
                                        '\n'
                                        'add_library(hello src/foo.cpp include/foo/foo.hpp)\n'
                                        'target_include_directories(hello PUBLIC include)\n'
@@ -24,6 +27,9 @@ def test_generate_lib_with_test():
     assert 'CMakeLists.txt' in files
     assert files['CMakeLists.txt'] == ('cmake_minimum_required(VERSION 3.2)\n'
                                        'project(hello)\n'
+                                       '\n'
+                                       'include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)\n'
+                                       'conan_basic_setup()\n'
                                        '\n'
                                        'add_library(hello src/foo.cpp include/foo/foo.hpp)\n'
                                        'target_include_directories(hello PUBLIC include)\n'
@@ -43,6 +49,9 @@ def test_generate_lib_with_test_and_prefix():
     assert 'CMakeLists.txt' in files
     assert files['CMakeLists.txt'] == ('cmake_minimum_required(VERSION 3.2)\n'
                                        'project(hello)\n'
+                                       '\n'
+                                       'include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)\n'
+                                       'conan_basic_setup()\n'
                                        '\n'
                                        'add_library(hello ../src/foo.cpp ../include/foo/foo.hpp)\n'
                                        'target_include_directories(hello PUBLIC ../include)\n'
@@ -64,6 +73,9 @@ def test_generate_lib_multiple_files():
     assert files['CMakeLists.txt'] == ('cmake_minimum_required(VERSION 3.2)\n'
                                        'project(hello)\n'
                                        '\n'
+                                       'include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)\n'
+                                       'conan_basic_setup()\n'
+                                       '\n'
                                        'add_library(hello src/bar.cpp src/foo.cpp'
                                        ' include/foo/bar.hpp include/foo/foo.hpp)\n'
                                        'target_include_directories(hello PUBLIC include)\n'
@@ -78,6 +90,9 @@ def test_generate_exe():
     assert files['CMakeLists.txt'] == ('cmake_minimum_required(VERSION 3.2)\n'
                                        'project(hello)\n'
                                        '\n'
+                                       'include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)\n'
+                                       'conan_basic_setup()\n'
+                                       '\n'
                                        'add_executable(hello foo.cpp)\n')
 
 
@@ -88,5 +103,8 @@ def test_generate_exe_multiple_files():
     assert 'CMakeLists.txt' in files
     assert files['CMakeLists.txt'] == ('cmake_minimum_required(VERSION 3.2)\n'
                                        'project(hello)\n'
+                                       '\n'
+                                       'include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)\n'
+                                       'conan_basic_setup()\n'
                                        '\n'
                                        'add_executable(hello bar.cpp bazz.cpp foo.cpp)\n')
