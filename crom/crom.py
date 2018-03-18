@@ -1,10 +1,12 @@
 from __future__ import print_function
 
 import argparse
+import os
 import sys
 
 import build
 import configure
+import opt_out
 import tools
 from bootstrap import cpp
 
@@ -65,17 +67,27 @@ def cmd_build(*argv):
     return build.build(args.path)
 
 
+def cmd_opt_out(*argv):
+    parser = argparse.ArgumentParser(prog="crom opt-out")
+    parser.add_argument("path", help="path to the project sources", default=os.getcwd(),
+                        nargs='?')
+    args = parser.parse_args(*argv)
+    return opt_out.opt_out(args.path)
+
+
 def usage():
     print("usage: crom <command>")
     print("  bootstrap      start a new project")
     print("  build          build a project")
     print("  configure      configure a project for build")
+    print("  opt-out        opt-out of crom")
     print('Try "crom <command> -h" to get help on a given command')
 
 
 def run():
     argv = sys.argv[1:]
-    commands = {'bootstrap': cmd_bootstrap, 'build': cmd_build, 'configure': cmd_configure}
+    commands = {'bootstrap': cmd_bootstrap, 'build': cmd_build, 'configure': cmd_configure,
+                'opt-out': cmd_opt_out}
     if len(argv) == 0 or argv[0] not in commands.keys():
         usage()
         return 1

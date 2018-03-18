@@ -4,7 +4,6 @@ from subprocess import call
 
 
 from generators import cmake, conan
-from project import Project
 import tools
 
 
@@ -14,14 +13,13 @@ def is_up_to_date(project_file):
             and os.path.getmtime(build_cfg_path) >= os.path.getmtime(project_file))
 
 
-def generate(project, src_dir):
+def generate(project, src_dir, prefix=None, exportSources=False):
     if project.type == 'lib':
-        config = cmake.generate_lib(project, 'src', 'include', os.path.relpath(src_dir))
+        config = cmake.generate_lib(project, 'src', 'include', prefix)
     else:
-        config = cmake.generate_exe(project, 'src', os.path.relpath(src_dir))
-    config.update(conan.generate(project))
-    tools.write_files(config)
-    return config.keys()
+        config = cmake.generate_exe(project, 'src', prefix)
+    config.update(conan.generate(project, exportSources))
+    return config
 
 
 def install_dependencies(profile=None):
@@ -31,16 +29,13 @@ def install_dependencies(profile=None):
 
 def do_configure(project_cfg_path):
     # Load project file
-    try:
-        with open(project_cfg_path, 'r') as f:
-            project = Project.from_yaml(f)
-    except Exception as e:
-        print("could not load project configuration: " + str(e))
-        return 1
+    project = tools.load_project(project_cfg_path)
 
     # Write configuration
-    files = generate(project, os.path.dirname(project_cfg_path))
-    print("Configuration files generated: " + ', '.join(files))
+    src_dir = os.path.dirname(project_cfg_path)
+    config = generate(project, src_dir, os.path.relpath(src_dir))
+    tools.write_files(config)
+    print("Configuration files generated: " + ', '.join(config.keys()))
 
     # Install deps
     ret = install_dependencies()
@@ -53,14 +48,16 @@ def do_configure(project_cfg_path):
 
 def configure(src_dir, force=False):
     try:
-        project_cfg_path = tools.get_build_file(src_dir)
+        project_cfg_path = tools.get_project_file(src_dir)
+
+        # Check if generated build config is older than project file
+        if not force and is_up_to_date(project_cfg_path):
+            print("configuration is up-to-date, nothing to do"
+                  " (re-run with --force to generate anyway)")
+            return 0
+
+        return do_configure(project_cfg_path)
+
     except RuntimeError as e:
         print(e.message)
         return 1
-
-    # Check if generated build config is older than project file
-    if not force and is_up_to_date(project_cfg_path):
-        print("configuration is up-to-date, nothing to do (re-run with --force to generate anyway)")
-        return 0
-
-    return do_configure(project_cfg_path)
