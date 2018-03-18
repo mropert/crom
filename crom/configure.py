@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os
 
-from generators import cmake
+from generators import cmake, conan
 from project import Project
 import tools
 
@@ -17,21 +17,16 @@ def generate(project, src_dir):
         config = cmake.generate_lib(project, 'src', 'include', os.path.relpath(src_dir))
     else:
         config = cmake.generate_exe(project, 'src', os.path.relpath(src_dir))
+    config.update(conan.generate(project))
     tools.write_files(config)
     return config.keys()
 
 
 def configure(src_dir, force=False):
-    # Forbid running from source dir
-    if os.path.abspath(src_dir) == os.getcwd():
-        print("build directory should be different from source directory")
-        print("please run this command from another directory")
-        return 1
-
-    # Lookup project file
-    project_cfg_path = os.path.join(src_dir, 'build.yml')
-    if not os.path.isfile(project_cfg_path):
-        print("%s doesn't seem to contain a build.yml file" % src_dir)
+    try:
+        project_cfg_path = tools.get_build_file(src_dir)
+    except RuntimeError as e:
+        print(e.message)
         return 1
 
     # Check if generated build config is older than project file

@@ -20,7 +20,10 @@ def apply_prefix_l(files, prefix):
 
 def header_decl(name):
     template = ("cmake_minimum_required(VERSION 3.2)\n"
-                "project({name})")
+                "project({name})\n"
+                "\n"
+                "include(${{CMAKE_BINARY_DIR}}/conanbuildinfo.cmake)\n"
+                "conan_basic_setup()")
     return template.format(name=name)
 
 

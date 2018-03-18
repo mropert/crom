@@ -3,6 +3,7 @@ from __future__ import print_function
 import argparse
 import sys
 
+import build
 import configure
 import tools
 from bootstrap import cpp
@@ -49,7 +50,7 @@ def cmd_bootstrap(*argv):
 
 
 def cmd_configure(*argv):
-    parser = argparse.ArgumentParser(prog="crom bootstrap")
+    parser = argparse.ArgumentParser(prog="crom configure")
     parser.add_argument("path", help="path to the project sources")
     parser.add_argument("-f", "--force", help="force re-configuration regardless of timestamps",
                         default=False, action='store_true')
@@ -57,16 +58,23 @@ def cmd_configure(*argv):
     return configure.configure(args.path, args.force)
 
 
+def cmd_build(*argv):
+    parser = argparse.ArgumentParser(prog="crom build")
+    parser.parse_args(*argv)
+    return build.build()
+
+
 def usage():
     print("usage: crom <command>")
     print("  bootstrap      start a new project")
+    print("  build          build a project")
     print("  configure      configure a project for build")
     print('Try "crom <command> -h" to get help on a given command')
 
 
 def run():
     argv = sys.argv[1:]
-    commands = {'bootstrap': cmd_bootstrap, 'configure': cmd_configure}
+    commands = {'bootstrap': cmd_bootstrap, 'build': cmd_build, 'configure': cmd_configure}
     if len(argv) == 0 or argv[0] not in commands.keys():
         usage()
         return 1
