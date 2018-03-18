@@ -6,6 +6,7 @@ class ConanProject(ConanFile):
     version = "0.1"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
+    exports_sources = %EXPORTS%
 
     def build(self):
         cmake = CMake(self)
