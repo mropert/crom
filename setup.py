@@ -124,7 +124,7 @@ setup(
     # executes the function `main` from this package when invoked:
     entry_points={  # Optional
         'console_scripts': [
-            'crom=crom:main',
+            'crom=crom.crom:run',
         ],
     },
 )
