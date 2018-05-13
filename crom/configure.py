@@ -1,4 +1,5 @@
 from __future__ import print_function
+import errno
 import os
 from subprocess import call
 
@@ -7,10 +8,22 @@ from generators import cmake, conan
 import tools
 
 
+def get_build_cfg_path():
+    return os.path.join(os.getcwd(), 'CMakeLists.txt')
+
+
 def is_up_to_date(project_file):
-    build_cfg_path = os.path.join(os.getcwd(), 'CMakeLists.txt')
+    build_cfg_path = get_build_cfg_path()
     return (os.path.isfile(build_cfg_path)
             and os.path.getmtime(build_cfg_path) >= os.path.getmtime(project_file))
+
+
+def mark_as_dirty():
+    try:
+        os.remove(get_build_cfg_path())
+    except OSError as e:
+        if e.errno != errno.ENOENT:
+            raise
 
 
 def generate(project, src_dir, prefix=None, exportSources=False):
@@ -43,7 +56,12 @@ def do_configure(project_cfg_path):
         print("configuration failed: could not install dependencies")
         return 1
 
-    return 0
+    # Configure package
+    ret = call(['conan', 'build', '.', '--configure'])
+    if ret:
+        print("configuration failed: could not configure build through conan")
+
+    return ret
 
 
 def configure(src_dir, force=False):
@@ -56,8 +74,11 @@ def configure(src_dir, force=False):
                   " (re-run with --force to generate anyway)")
             return 0
 
-        return do_configure(project_cfg_path)
+        ret = do_configure(project_cfg_path)
+        if ret:
+            mark_as_dirty()
 
     except RuntimeError as e:
         print(e.message)
+        mark_as_dirty()
         return 1
