@@ -18,7 +18,7 @@ pip install crom
 ## Requirements
 
 Crom requires Python (either 2 or 3) and uses the following tools behind the scenes:
-* Conan C/C++ package manager (available through `pip`)
+* Conan C/C++ package manager 1.2.0 or later (available through `pip`)
 * CMake 3.2 or later
 
 ## Usage
@@ -29,7 +29,7 @@ Crom requires Python (either 2 or 3) and uses the following tools behind the sce
 crom bootstrap lib MyLib
 ```
 
-### Configure, install dependencies and build project
+### Configure and install dependencies (if needed) then build project
 
 ```
 mkdir build
@@ -43,8 +43,6 @@ crom build ..
 cd build
 crom configure ..
 ```
-
-(Does not re-run CMake for now so generated solution will still be out of date)
 
 ### Opt-out of crom
 

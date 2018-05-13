@@ -16,7 +16,7 @@ def build(src_dir):
                 print('reconfiguration failed')
                 return 1
 
-        ret = call(['conan', 'build', '.'])
+        ret = call(['conan', 'build', '.', '--build'])
         if ret:
             print('build failed')
             return 1
