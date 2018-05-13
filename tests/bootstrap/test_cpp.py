@@ -10,11 +10,14 @@ def test_generate_lib():
 
     assert len(project.headers) == 1
     assert len(project.sources) == 1
-    assert len(project.tests) == 1
+    assert len(project.tests) == 2
 
     assert 'hello/hello.hpp' in project.headers
     assert 'hello.cpp' in project.sources
     assert 'hello_test.cpp' in project.tests
+    assert 'main.cpp' in project.tests
+
+    assert project.test_deps == ['catch2/2.2.2@bincrafters/stable']
 
     assert project.headers['hello/hello.hpp'] == ('#ifndef HELLO_HELLO_HPP\n'
                                                   '#define HELLO_HELLO_HPP\n'
@@ -40,26 +43,24 @@ def test_generate_lib():
                                             '}\n')
 
     assert project.tests['hello_test.cpp'] == (
-        '// FIXME: You definitely want to include a test framework here\n'
-        '#include <iostream>\n'
-        '#define ASSERT(cond) \\\n'
-        '   if (!(cond)) {\\\n'
-        '       std::cerr << "Assertion failed: " << #cond << std::endl;\\\n'
-        '       return 1;\\\n'
-        '   }\n'
+        '#include <catch.hpp>\n'
         '\n'
         '#include <hello/hello.hpp>\n'
         'using namespace hello;\n'
         '\n'
-        'int main() {\n'
-        '   ASSERT(foo() == "Hello world!");\n'
-        '   ASSERT(bar(1, 1) == 2);\n'
-        '   ASSERT(bar(1, 2) == 3);\n'
-        '   ASSERT(bar(0, 42) == 42);\n'
+        'TEST_CASE("foo returns hello world", "[foo]") {\n'
+        '   REQUIRE(foo() == "Hello world!");\n'
+        '}\n'
         '\n'
-        '   std::cout << "All tests passed!" << std::endl;\n'
-        '   return 0;\n'
+        'TEST_CASE("bar sums the arguments", "[bar]") {\n'
+        '   REQUIRE(bar(1, 1) == 2);\n'
+        '   REQUIRE(bar(1, 2) == 3);\n'
+        '   REQUIRE(bar(0, 42) == 42);\n'
         '}\n')
+    
+    assert project.tests['main.cpp'] == (
+        '#define CATCH_CONFIG_MAIN // Tell catch to build main here\n'
+        '#include <catch.hpp>\n')
 
 
 def test_generate_exe():

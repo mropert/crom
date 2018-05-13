@@ -41,9 +41,12 @@ def install_dependencies(profile=None):
     return call(['conan', 'install', '.', '--build=outdated'] + args)
 
 
-def do_configure(project_cfg_path):
-    # Load project file
-    project = tools.load_project(project_cfg_path)
+def do_configure(project_cfg_path, project=None):
+    # Load project file if needed
+    if project is None:
+        project = tools.load_project(project_cfg_path)
+
+    print("Configuring project [%s]" % project.name)
 
     # Write configuration
     src_dir = os.path.dirname(project_cfg_path)
@@ -65,17 +68,19 @@ def do_configure(project_cfg_path):
     return ret
 
 
-def configure(src_dir, force=False):
+def configure(src_dir, project=None, force=False, cmd=False):
     try:
         project_cfg_path = tools.get_project_file(src_dir)
 
         # Check if generated build config is older than project file
         if not force and is_up_to_date(project_cfg_path):
-            print("configuration is up-to-date, nothing to do"
-                  " (re-run with --force to generate anyway)")
+            if cmd:
+                print("configuration is up-to-date, nothing to do"
+                      " (re-run with --force to generate anyway)")
             return 0
 
-        ret = do_configure(project_cfg_path)
+        print("Project configuration is out-of-date, reconfiguring...")
+        ret = do_configure(project_cfg_path, project)
         if ret:
             mark_as_dirty()
 

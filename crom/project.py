@@ -29,7 +29,8 @@ class Target:
 
     @staticmethod
     def from_dict(data):
-        return Target(data.get('sources', []), data.get('headers', []), data.get('deps', []))
+        return Target(data.get('sources', []), data.get('headers', []),
+                      data.get('dependencies', []))
 
 
 class Project:
@@ -41,6 +42,9 @@ class Project:
         self.type = type
         self.target = Target(sources, headers)
         self.tests = Target(tests, deps=test_deps)
+
+    def get_test_executable(self):
+        return self.name + '_test' if len(self.tests.sources) > 0 else None
 
     def to_yaml(self):
         d = OrderedDict([('name', self.name), ('type', self.type)])

@@ -10,12 +10,14 @@ class ConanProject(ConanFile):
 
 %if len(deps) > 0 or len(test_deps) > 0:
     def requirements(self):
-    %if len(deps) > 0:
-        self.requires("${deps}")
-    %endif
+    %for d in deps:
+        self.requires('${d}')
+    %endfor
     %if len(test_deps) > 0:
         if self.develop:
-            self.requires("${test_deps}")
+        %for d in test_deps:
+            self.requires('${d}')
+        %endfor
     %endif
 
 %endif

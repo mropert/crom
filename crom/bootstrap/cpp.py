@@ -86,9 +86,10 @@ def generate_lib(name):
     sources = {file: template.format(header_path=header_path, namespace=name)}
 
     # Tests
-    tests = generate_dummy_test(name, header_path)
+    tests = generate_catch_test(name, header_path)
 
-    return Bootstrap(name, Project.LIBRARY, sources, headers, tests)
+    return Bootstrap(name, Project.LIBRARY, sources, headers, tests,
+                     ['catch2/2.2.2@bincrafters/stable'])
 
 
 def generate_exe(name):

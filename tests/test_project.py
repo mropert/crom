@@ -5,12 +5,17 @@ def test_constructor():
     sources = ['bar.cpp', 'foo.cpp']
     headers = ['hello/bar.hpp', 'hello/foo.hpp']
     tests = ['test/test.cpp']
-    project = Project('hello', 'lib', sources=sources, headers=headers, tests=tests)
+    test_deps = ['test/1.0.0@example/testing']
+    project = Project('hello', 'lib', sources=sources, headers=headers, tests=tests,
+                      test_deps=test_deps)
     assert project.name == 'hello'
     assert project.type == 'lib'
     assert project.target.sources == sources
     assert project.target.headers == headers
+    assert project.target.deps == []
     assert project.tests.sources == tests
+    assert project.tests.headers == []
+    assert project.tests.deps == test_deps
 
 
 def test_constructor_unsorted():

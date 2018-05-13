@@ -58,7 +58,7 @@ def cmd_configure(*argv):
     parser.add_argument("-f", "--force", help="force re-configuration regardless of timestamps",
                         default=False, action='store_true')
     args = parser.parse_args(*argv)
-    return configure.configure(args.path, args.force)
+    return configure.configure(args.path, args.force, cmd=True)
 
 
 def cmd_build(*argv):
@@ -80,8 +80,15 @@ def cmd_test(*argv):
     parser = argparse.ArgumentParser(prog="crom test")
     parser.add_argument("path", help="path to the project sources")
     args = parser.parse_args(*argv)
-    return (configure.configure(args.path)
-            or call(['cmake', '--build', '.', '--target', 'RUN_TESTS']))
+    cfg_file = tools.get_project_file(args.path)
+    project = tools.load_project(cfg_file)
+    test_exe = project.get_test_executable()
+    if test_exe is None:
+        print("No tests defined for project %s!" % project.name)
+        return 1
+    # FIXME: we should launch build in all cases, but build shouldn't launch tests...
+    return (configure.configure(args.path, project=project)
+            or call(os.path.join(os.getcwd(), 'bin', test_exe)))
 
 
 def usage():
