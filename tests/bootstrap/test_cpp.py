@@ -1,11 +1,12 @@
 from crom.bootstrap import cpp
+from crom.project import Project
 
 
 def test_generate_lib():
     project = cpp.generate_lib('hello')
 
     assert project.name == 'hello'
-    assert project.type == 'lib'
+    assert project.type == Project.LIBRARY
 
     assert len(project.headers) == 1
     assert len(project.sources) == 1
@@ -65,7 +66,7 @@ def test_generate_exe():
     project = cpp.generate_exe('hello')
 
     assert project.name == 'hello'
-    assert project.type == 'exe'
+    assert project.type == Project.EXECUTABLE
 
     assert len(project.headers) == 0
     assert len(project.sources) == 1

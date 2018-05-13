@@ -2,12 +2,23 @@ from conans import ConanFile, CMake
 
 
 class ConanProject(ConanFile):
-    name = "%NAME%"
+    name = "${name}"
     version = "0.1"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
-    exports_sources = %EXPORTS%
+    exports_sources = ${sources}
 
+%if len(deps) > 0 or len(test_deps) > 0:
+    def requirements(self):
+    %if len(deps) > 0:
+        self.requires("${deps}")
+    %endif
+    %if len(test_deps) > 0:
+        if self.develop:
+            self.requires("${test_deps}")
+    %endif
+
+%endif
     def build(self):
         cmake = CMake(self)
         cmake.configure()

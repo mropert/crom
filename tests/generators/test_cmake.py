@@ -3,7 +3,7 @@ from crom.project import Project
 
 
 def test_generate_lib():
-    project = Project('hello', 'lib', sources={'src/foo.cpp': None},
+    project = Project('hello', Project.LIBRARY, sources={'src/foo.cpp': None},
                       headers={'include/foo/foo.hpp': None})
     files = cmake.generate_lib(project, 'src', 'include')
     assert len(files) == 1
@@ -20,7 +20,7 @@ def test_generate_lib():
 
 
 def test_generate_lib_with_test():
-    project = Project('hello', 'lib', sources={'src/foo.cpp': None},
+    project = Project('hello', Project.LIBRARY, sources={'src/foo.cpp': None},
                       headers={'include/foo/foo.hpp': None}, tests={'test/test.cpp': None})
     files = cmake.generate_lib(project, 'src', 'include')
     assert len(files) == 1
@@ -42,7 +42,7 @@ def test_generate_lib_with_test():
 
 
 def test_generate_lib_with_test_and_prefix():
-    project = Project('hello', 'lib', sources={'src/foo.cpp': None},
+    project = Project('hello', Project.LIBRARY, sources={'src/foo.cpp': None},
                       headers={'include/foo/foo.hpp': None}, tests={'test/test.cpp': None})
     files = cmake.generate_lib(project, 'src', 'include', prefix="..")
     assert len(files) == 1
@@ -64,7 +64,7 @@ def test_generate_lib_with_test_and_prefix():
 
 
 def test_generate_lib_multiple_files():
-    project = Project('hello', 'lib', sources={'src/foo.cpp': None, 'src/bar.cpp': None},
+    project = Project('hello', Project.LIBRARY, sources={'src/foo.cpp': None, 'src/bar.cpp': None},
                       headers={'include/foo/foo.hpp': None, 'include/foo/bar.hpp': None})
 
     files = cmake.generate_lib(project, 'src', 'include')
@@ -83,7 +83,7 @@ def test_generate_lib_multiple_files():
 
 
 def test_generate_exe():
-    project = Project('hello', 'exe', sources={'foo.cpp': None})
+    project = Project('hello', Project.EXECUTABLE, sources={'foo.cpp': None})
     files = cmake.generate_exe(project, None)
     assert len(files) == 1
     assert 'CMakeLists.txt' in files
@@ -97,7 +97,8 @@ def test_generate_exe():
 
 
 def test_generate_exe_multiple_files():
-    project = Project('hello', 'exe', sources={'foo.cpp': None, 'bar.cpp': None, 'bazz.cpp': None})
+    project = Project('hello', Project.EXECUTABLE,
+                      sources={'foo.cpp': None, 'bar.cpp': None, 'bazz.cpp': None})
     files = cmake.generate_exe(project, None)
     assert len(files) == 1
     assert 'CMakeLists.txt' in files

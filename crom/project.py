@@ -17,21 +17,42 @@ def represent_ordereddict(dumper, data):
 yaml.add_representer(OrderedDict, represent_ordereddict)
 
 
-class Project:
-    def __init__(self, name, type, sources=[], headers=[], tests=[]):
-        self.name = name
-        self.type = type
+class Target:
+    def __init__(self, sources=[], headers=[], deps=[]):
         self.sources = sorted(sources)
         self.headers = sorted(headers)
-        self.tests = sorted(tests)
+        self.deps = sorted(deps)
+
+    def as_dict(self):
+        return OrderedDict([('sources', self.sources), ('headers', self.headers),
+                            ('dependencies', self.deps)])
+
+    @staticmethod
+    def from_dict(data):
+        return Target(data.get('sources', []), data.get('headers', []), data.get('deps', []))
+
+
+class Project:
+    EXECUTABLE = 'exe'
+    LIBRARY = 'lib'
+
+    def __init__(self, name, type, sources=[], headers=[], tests=[], test_deps=[]):
+        self.name = name
+        self.type = type
+        self.target = Target(sources, headers)
+        self.tests = Target(tests, deps=test_deps)
 
     def to_yaml(self):
-        return yaml.dump(OrderedDict([('name', self.name), ('type', self.type),
-                                     ('sources', self.sources), ('headers', self.headers),
-                                     ('tests', self.tests)]),
-                         default_flow_style=False)
+        d = OrderedDict([('name', self.name), ('type', self.type)])
+        d.update(self.target.as_dict())
+        d['tests'] = self.tests.as_dict()
+
+        return yaml.dump(d, default_flow_style=False)
 
     @staticmethod
     def from_yaml(stream):
         data = yaml.load(stream)
-        return Project(data['name'], data['type'], data['sources'], data['headers'], data['tests'])
+        target = Target.from_dict(data)
+        tests = Target.from_dict(data['tests'])
+        return Project(data['name'], data['type'], target.sources, target.headers, tests.sources,
+                       tests.deps)

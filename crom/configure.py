@@ -5,6 +5,7 @@ from subprocess import call
 
 
 from generators import cmake, conan
+from project import Project
 import tools
 
 
@@ -27,7 +28,7 @@ def mark_as_dirty():
 
 
 def generate(project, src_dir, prefix=None, exportSources=False):
-    if project.type == 'lib':
+    if project.type == Project.LIBRARY:
         config = cmake.generate_lib(project, 'src', 'include', prefix)
     else:
         config = cmake.generate_exe(project, 'src', prefix)
