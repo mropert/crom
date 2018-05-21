@@ -57,7 +57,7 @@ def test_generate_lib():
         '   REQUIRE(bar(1, 2) == 3);\n'
         '   REQUIRE(bar(0, 42) == 42);\n'
         '}\n')
-    
+
     assert project.tests['main.cpp'] == (
         '#define CATCH_CONFIG_MAIN // Tell catch to build main here\n'
         '#include <catch.hpp>\n')
