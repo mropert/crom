@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import argparse
 import os
+from subprocess import call
 import sys
 
 import build
@@ -57,7 +58,7 @@ def cmd_configure(*argv):
     parser.add_argument("-f", "--force", help="force re-configuration regardless of timestamps",
                         default=False, action='store_true')
     args = parser.parse_args(*argv)
-    return configure.configure(args.path, args.force)
+    return configure.configure(args.path, args.force, cmd=True)
 
 
 def cmd_build(*argv):
@@ -75,19 +76,35 @@ def cmd_opt_out(*argv):
     return opt_out.opt_out(args.path)
 
 
+def cmd_test(*argv):
+    parser = argparse.ArgumentParser(prog="crom test")
+    parser.add_argument("path", help="path to the project sources")
+    args = parser.parse_args(*argv)
+    cfg_file = tools.get_project_file(args.path)
+    project = tools.load_project(cfg_file)
+    test_exe = project.get_test_executable()
+    if test_exe is None:
+        print("No tests defined for project %s!" % project.name)
+        return 1
+    # FIXME: we should launch build in all cases, but build shouldn't launch tests...
+    return (configure.configure(args.path, project=project)
+            or call(os.path.join(os.getcwd(), 'bin', test_exe)))
+
+
 def usage():
     print("usage: crom <command>")
     print("  bootstrap      start a new project")
     print("  build          build a project")
     print("  configure      configure a project for build")
     print("  opt-out        opt-out of crom")
+    print("  test           run a project's unit tests")
     print('Try "crom <command> -h" to get help on a given command')
 
 
 def run():
     argv = sys.argv[1:]
     commands = {'bootstrap': cmd_bootstrap, 'build': cmd_build, 'configure': cmd_configure,
-                'opt-out': cmd_opt_out}
+                'opt-out': cmd_opt_out, 'test': cmd_test}
     if len(argv) == 0 or argv[0] not in commands.keys():
         usage()
         return 1
