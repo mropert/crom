@@ -8,7 +8,6 @@ def test_generate():
     files = conan.generate(project)
     assert len(files) == 1
     assert 'conanfile.py' in files
-    print files['conanfile.py']
 
     assert files['conanfile.py'] == """from conans import ConanFile, CMake
 
@@ -44,7 +43,6 @@ def test_generate_with_deps():
     files = conan.generate(project)
     assert len(files) == 1
     assert 'conanfile.py' in files
-    print files['conanfile.py']
 
     assert files['conanfile.py'] == """from conans import ConanFile, CMake
 
